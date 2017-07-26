@@ -4,12 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.randofilm.sergdort.randomfilm.com.randomfilm.sergdort.scenes.randomfilms.RandomFilmActivity">
+    tools:context="com.randomfilm.sergdort.scenes.randomfilms.RandomFilmActivity">
 
-    <EditText
-        android:id="@+id/editTextView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycleView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="search"/>
-
+        android:layout_height="match_parent"/>
 </android.support.constraint.ConstraintLayout>

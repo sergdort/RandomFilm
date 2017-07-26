@@ -37,5 +37,6 @@ dependencies {
     compile 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0'
     compile 'com.trello.rxlifecycle2:rxlifecycle-android-lifecycle-kotlin:2.1.0'
     compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
+    compile 'com.android.support:recyclerview-v7:25.4.0'
     compile project(path: ':Domain')
 }
