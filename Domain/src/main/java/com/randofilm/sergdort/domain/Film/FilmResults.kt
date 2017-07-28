@@ -10,4 +10,4 @@ data class FilmResults(
         @SerializedName("total_pages")
         val totalPages: Int,
         @SerializedName("results")
-        val results: Array<Film>) {}
+        val results: List<Film>) {}
