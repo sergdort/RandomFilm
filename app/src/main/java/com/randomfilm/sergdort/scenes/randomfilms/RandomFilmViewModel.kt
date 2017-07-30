@@ -8,7 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 
-class RandomFilmViewModel(val filmsUseCase: FilmUseCase) : ViewModel<RandomFilmViewModel.Input, RandomFilmViewModel.Output> {
+class RandomFilmViewModel(val filmsUseCase: FilmUseCase, val navigator: IRandomFilmNavigator) : ViewModel<RandomFilmViewModel.Input, RandomFilmViewModel.Output> {
 
     override fun transform(input: Input): Output {
         val loadingIndicator = LoadingIndicator()
@@ -24,9 +24,14 @@ class RandomFilmViewModel(val filmsUseCase: FilmUseCase) : ViewModel<RandomFilmV
                 .map { it.results }
                 .shareReplayLatestWhileConnected()
 
-        return Output(films, loadingIndicator.asObservable())
+        val filmDetailsNavigation = input.selection
+                .doOnNext(navigator::toFilmDetails)
+                .mapTo(Unit)
+                .share()
+
+        return Output(films, loadingIndicator.asObservable(), filmDetailsNavigation)
     }
 
-    class Input(val refreshTrigger: Observable<Unit>) {}
-    class Output(val films: Observable<List<Film>>, val loading: Observable<Boolean>) {}
+    class Input(val refreshTrigger: Observable<Unit>, val selection: Observable<Film>) {}
+    class Output(val films: Observable<List<Film>>, val loading: Observable<Boolean>, val filmDetailsNavigation: Observable<Unit>) {}
 }

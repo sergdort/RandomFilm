@@ -14,6 +14,8 @@ fun <T> Observable<T>.shareReplayLatestWhileConnected(): Observable<T> {
     return this.replay(1).refCount()
 }
 
+fun <T, U> Observable<T>.mapTo(value: U): Observable<U> = this.map { value }
+
 fun <T> Observable<T>.catchErrorJustComplete(): Observable<T> = this.onErrorResumeNext(Observable.empty())
 
 fun <T, View> Observable<T>.bindTo(observer: UIBindingObserver<View,T>) = this.subscribe { observer.binding(observer.view, it) }
