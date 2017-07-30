@@ -4,19 +4,18 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import com.randofilm.sergdort.domain.Film.Film
+import com.randofilm.sergdort.platform.UseCaseFactory.PlatformUseCaseFactory
 import com.randofilm.sergdort.randomfilm.R
 import com.randomfilm.sergdort.common.adapters.ListRecycleViewAdapter
-import com.randomfilm.sergdort.domain.Networking.APIProvider
 import com.randomfilm.sergdort.extensions.*
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_random_film.*
 import kotlinx.android.synthetic.main.film_cell_item.view.*
 
 class RandomFilmActivity : RxAppCompatActivity() {
-    private val apiProvider = APIProvider()
-    private val filmAPI = apiProvider.makeFilmsAPI()
+    //TODO: this should be injected
+    private val viewModel = RandomFilmViewModel(PlatformUseCaseFactory().makeFilmsUseCase())
+
     private val listViewAdapter = ListRecycleViewAdapter<Film>({
         Log.d("CLICK", "$it")
     }, {
@@ -32,13 +31,7 @@ class RandomFilmActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_random_film)
         configureRecycleView()
-
-        filmAPI.discoverFilms()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map { it.results }
-                .takeUntilDestroyOf(this)
-                .bindTo(listViewAdapter)
+        bindViewModel()
     }
 
     private fun configureRecycleView() {
@@ -46,4 +39,16 @@ class RandomFilmActivity : RxAppCompatActivity() {
         recycleView.adapter = listViewAdapter
         recycleView.setHasFixedSize(true)
     }
+
+    private fun bindViewModel() {
+        val input = RandomFilmViewModel.Input(swipeRefresh.rx_refresh())
+        val output = viewModel.transform(input)
+
+        output.loading
+                .takeUntilDestroyOf(this)
+                .bindTo(swipeRefresh.rx_refreshing())
+        output.films.takeUntilDestroyOf(this)
+                .bindTo(listViewAdapter)
+    }
 }
+

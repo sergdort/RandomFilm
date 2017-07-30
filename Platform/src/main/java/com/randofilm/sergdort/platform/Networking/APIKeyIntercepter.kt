@@ -1,4 +1,4 @@
-package com.randomfilm.sergdort.domain.Networking
+package com.randofilm.sergdort.platform.Networking
 
 import okhttp3.*
 
