@@ -1,7 +1,7 @@
 package com.randofilm.sergdort.platform.Networking
 
 import com.google.gson.GsonBuilder
-import com.randofilm.sergdort.platform.Film.FilmsAPI
+import com.randofilm.sergdort.platform.Film.Film
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -27,6 +27,8 @@ internal class APIProvider {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
 
+
+    fun makeDiscoverAPI(): DiscoverAPI = retrofit.create(DiscoverAPI::class.java)
 
     fun makeFilmsAPI(): FilmsAPI = retrofit.create(FilmsAPI::class.java)
 }
