@@ -12,18 +12,22 @@ import io.reactivex.Observable
 
 class FilmDetailsActivity : RxAppCompatActivity() {
 
-    //    TODO: Use correct id
     private val viewModel: FilmDetailsViewModel
         get() = Dependencies.instance
                 .makeFilmDetailsAssembly()
-                .makeViewModelWith(321612, this)
+                .makeViewModelWith(FilmDetailsActivity.filmIdFrom(intent), this)
 
     companion object {
         private val extraFilmID = "EXTRA_FILM_ID"
+
         fun createIntentWith(film: Film, context: Context): Intent {
             val intent = Intent(context, FilmDetailsActivity::class.java)
-            intent.putExtra(FilmDetailsActivity.extraFilmID, film.id)
+            intent.putExtra(extraFilmID, film.id)
             return intent
+        }
+
+        fun filmIdFrom(intent: Intent): Int {
+            return intent.getIntExtra(extraFilmID, 0)
         }
     }
 
