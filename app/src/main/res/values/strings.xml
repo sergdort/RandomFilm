@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RandomFilm</string>
+    <string name="staring">Starring:</string>
+    <string name="creator">Creator:</string>
 </resources>

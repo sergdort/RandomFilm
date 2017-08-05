@@ -43,6 +43,11 @@ class FilmDetailsActivity : RxAppCompatActivity() {
         output.title
                 .takeUntilDestroyOf(this)
                 .subscribe(titleTextView::setText)
+
+        output.overview
+                .takeUntilDestroyOf(this)
+                .subscribe(overviewTextView::setText)
+
         output.backDropImageURL
                 .takeUntilDestroyOf(this)
                 .subscribe(backDropImageView::setImageFromUrl)

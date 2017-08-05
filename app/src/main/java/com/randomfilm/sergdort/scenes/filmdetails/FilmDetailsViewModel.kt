@@ -27,6 +27,11 @@ class FilmDetailsViewModel(private val filmID: Int,
                 .map { it.title }
                 .shareReplayLatestWhileConnected()
 
+        val overview = filmDetails
+                .map { it.overview.wrap() }
+                .skipNil()
+                .shareReplayLatestWhileConnected()
+
         val backDropImageURL = filmDetails
                 .map {
                     it.backdropPath.wrap()
@@ -41,12 +46,13 @@ class FilmDetailsViewModel(private val filmID: Int,
                 .map { "https://image.tmdb.org/t/p/w500/$it" }
 
 
-        return Output(title, backDropImageURL, posterImageURL, loadingIndicator.asObservable())
+        return Output(title, overview, posterImageURL, loadingIndicator.asObservable(), backDropImageURL)
     }
 
     class Input(val reloadTrigger: Observable<Unit>)
     class Output(val title: Observable<String>,
-                 val backDropImageURL: Observable<String>,
+                 val overview: Observable<String>,
                  val posterImageURL: Observable<String>,
-                 val loading: Observable<Boolean>)
+                 val loading: Observable<Boolean>,
+                 val backDropImageURL: Observable<String>)
 }
