@@ -8,7 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 
-class RandomFilmViewModel(val filmsUseCase: FilmUseCase, val navigator: IRandomFilmNavigator) : ViewModel<RandomFilmViewModel.Input, RandomFilmViewModel.Output> {
+class RandomFilmViewModel(private val filmsUseCase: FilmUseCase, private val navigator: IRandomFilmNavigator) : ViewModel<RandomFilmViewModel.Input, RandomFilmViewModel.Output> {
 
     override fun transform(input: Input): Output {
         val loadingIndicator = LoadingIndicator()

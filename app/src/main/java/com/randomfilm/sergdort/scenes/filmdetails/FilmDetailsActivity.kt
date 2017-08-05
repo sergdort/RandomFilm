@@ -2,20 +2,19 @@ package com.randomfilm.sergdort.scenes.filmdetails
 
 import android.content.*
 import android.os.Bundle
-import android.util.Log
 import com.randofilm.sergdort.domain.Film.Film
 import com.randofilm.sergdort.randomfilm.R
 import com.randomfilm.sergdort.Dependencies
-import com.randomfilm.sergdort.extensions.takeUntilDestroyOf
+import com.randomfilm.sergdort.extensions.*
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-import io.reactivex.Observable
+import kotlinx.android.synthetic.main.activity_film_details.*
 
 class FilmDetailsActivity : RxAppCompatActivity() {
 
     private val viewModel: FilmDetailsViewModel
         get() = Dependencies.instance
                 .makeFilmDetailsAssembly()
-                .makeViewModelWith(FilmDetailsActivity.filmIdFrom(intent), this)
+                .makeViewModelWith(FilmDetailsActivity.filmIdFrom(intent))
 
     companion object {
         private val extraFilmID = "EXTRA_FILM_ID"
@@ -38,13 +37,20 @@ class FilmDetailsActivity : RxAppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        val input = FilmDetailsViewModel.Input(Observable.empty())
+        val input = FilmDetailsViewModel.Input(swipeRefresh.rx_refresh())
         val output = viewModel.transform(input)
 
-        output.filmDetails
+        output.title
                 .takeUntilDestroyOf(this)
-                .subscribe {
-                    Log.d("ITEMS", "$it")
-                }
+                .subscribe(titleTextView::setText)
+        output.backDropImageURL
+                .takeUntilDestroyOf(this)
+                .subscribe(backDropImageView::setImageFromUrl)
+
+        output.posterImageURL
+                .takeUntilDestroyOf(this)
+                .subscribe(posterImageView::setImageFromUrl)
+
+        output.loading.subscribe(swipeRefresh::setRefreshing)
     }
 }

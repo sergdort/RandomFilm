@@ -12,11 +12,3 @@ fun SwipeRefreshLayout.rx_refresh(): Observable<Unit> {
     }
     return refresh.share()
 }
-
-fun SwipeRefreshLayout.rx_refreshing(): UIBindingObserver<SwipeRefreshLayout, Boolean> {
-    return UIBindingObserver(this, { refreshLayout, refreshing ->
-        refreshLayout.isRefreshing = refreshing
-    })
-}
-
-class UIBindingObserver<View, T>(val view: View, val binding: (View, T) -> Unit)

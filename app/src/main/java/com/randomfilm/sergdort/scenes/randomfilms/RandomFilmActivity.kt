@@ -46,7 +46,7 @@ class RandomFilmActivity : RxAppCompatActivity() {
 
         output.loading
                 .takeUntilDestroyOf(this)
-                .bindTo(swipeRefresh.rx_refreshing())
+                .subscribe(swipeRefresh::setRefreshing)
         output.films.takeUntilDestroyOf(this)
                 .bindTo(listViewAdapter)
         output.filmDetailsNavigation
