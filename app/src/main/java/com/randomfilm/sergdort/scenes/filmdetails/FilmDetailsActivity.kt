@@ -56,6 +56,14 @@ class FilmDetailsActivity : RxAppCompatActivity() {
                 .takeUntilDestroyOf(this)
                 .subscribe(posterImageView::setImageFromUrl)
 
+        output.year
+                .takeUntilDestroyOf(this)
+                .subscribe(yearTextView::setText)
+
+        output.rating
+                .takeUntilDestroyOf(this)
+                .subscribe(ratingTextView::setText)
+
         output.loading.subscribe(swipeRefresh::setRefreshing)
     }
 }

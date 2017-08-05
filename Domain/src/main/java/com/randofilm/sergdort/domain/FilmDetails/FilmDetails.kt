@@ -1,5 +1,7 @@
 package com.randofilm.sergdort.domain.FilmDetails
 
+import java.util.*
+
 data class FilmDetails(val id: Int,
                        val title: String,
                        val overview: String?,
@@ -8,4 +10,5 @@ data class FilmDetails(val id: Int,
                        val posterPath: String?,
                        val backdropPath: String?,
                        val budget: Int,
-                       val revenue: Int)
+                       val revenue: Int,
+                       val releaseDate: Date)

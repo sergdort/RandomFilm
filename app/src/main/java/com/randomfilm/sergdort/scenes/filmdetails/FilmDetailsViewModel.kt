@@ -6,6 +6,7 @@ import com.randomfilm.sergdort.extensions.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 class FilmDetailsViewModel(private val filmID: Int,
                            private val filmDetailsUseCase: FilmDetailsUseCase) : ViewModel<FilmDetailsViewModel.Input, FilmDetailsViewModel.Output> {
@@ -45,8 +46,20 @@ class FilmDetailsViewModel(private val filmID: Int,
                 .skipNil()
                 .map { "https://image.tmdb.org/t/p/w500/$it" }
 
+        val rating = filmDetails
+                .map { "${it.voteAverage}" }
+                .shareReplayLatestWhileConnected()
 
-        return Output(title, overview, posterImageURL, loadingIndicator.asObservable(), backDropImageURL)
+        val year = filmDetails.map {
+            val calendar = GregorianCalendar()
+            calendar.time = it.releaseDate
+
+            "${calendar.get(Calendar.YEAR)}"
+        }
+
+
+
+        return Output(title, overview, posterImageURL, loadingIndicator.asObservable(), backDropImageURL, year, rating)
     }
 
     class Input(val reloadTrigger: Observable<Unit>)
@@ -54,5 +67,7 @@ class FilmDetailsViewModel(private val filmID: Int,
                  val overview: Observable<String>,
                  val posterImageURL: Observable<String>,
                  val loading: Observable<Boolean>,
-                 val backDropImageURL: Observable<String>)
+                 val backDropImageURL: Observable<String>,
+                 val year: Observable<String>,
+                 val rating: Observable<String>)
 }
