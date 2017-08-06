@@ -14,60 +14,58 @@ class FilmDetailsViewModel(private val filmID: Int,
     override fun transform(input: Input): Output {
         val loadingIndicator = LoadingIndicator()
 
-        val filmDetails = input.reloadTrigger
+        val pair = input.reloadTrigger
                 .startWith(Unit)
                 .switchMap {
                     filmDetailsUseCase.detailsFor(filmID)
+                            .combineLatestWith(filmDetailsUseCase.creditsFor(filmID))
                             .subscribeOn(Schedulers.io())
                             .trackLoading(loadingIndicator)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .shareReplayLatestWhileConnected()
 
-        val title = filmDetails
-                .map { it.title }
+        val detailsViewData = pair
+                .map { mapToViewData(it.first) }
                 .shareReplayLatestWhileConnected()
 
-        val overview = filmDetails
-                .map { it.overview.wrap() }
-                .skipNil()
-                .shareReplayLatestWhileConnected()
 
-        val backDropImageURL = filmDetails
+        val castNames = pair
                 .map {
-                    it.backdropPath.wrap()
+                    it.second.cast.take(10).map { it.name }.joinToString(", ")
                 }
-                .skipNil()
-                .map { "https://image.tmdb.org/t/p/w780/$it" }
+                .shareReplayLatestWhileConnected()
+        val crewNames = pair.map { it.second.crew.take(10).map { it.name }.joinToString(", ") }
                 .shareReplayLatestWhileConnected()
 
-        val posterImageURL = filmDetails
-                .map { it.posterPath.wrap() }
-                .skipNil()
-                .map { "https://image.tmdb.org/t/p/w500/$it" }
-
-        val rating = filmDetails
-                .map { "${it.voteAverage}" }
-                .shareReplayLatestWhileConnected()
-
-        val year = filmDetails.map {
-            val calendar = GregorianCalendar()
-            calendar.time = it.releaseDate
-
-            "${calendar.get(Calendar.YEAR)}"
-        }
-
-
-
-        return Output(title, overview, posterImageURL, loadingIndicator.asObservable(), backDropImageURL, year, rating)
+        return Output(loadingIndicator.asObservable(), detailsViewData, castNames, crewNames)
     }
 
+    private fun mapToViewData(details: FilmDetails): DetailsViewData {
+        val calendar = GregorianCalendar()
+        calendar.time = details.releaseDate
+        val year = "${calendar.get(Calendar.YEAR)}"
+
+        return DetailsViewData(
+                details.title,
+                details.overview.wrap().defaultTo(""),
+                "https://image.tmdb.org/t/p/w500/${details.posterPath}",
+                "https://image.tmdb.org/t/p/w780/${details.backdropPath}",
+                year,
+                "${details.voteAverage}")
+    }
+
+    data class DetailsViewData(
+            val title: String,
+            val overview: String,
+            val posterImageURL: String,
+            val backDropImageURL: String,
+            val year: String,
+            val rating: String)
+
     class Input(val reloadTrigger: Observable<Unit>)
-    class Output(val title: Observable<String>,
-                 val overview: Observable<String>,
-                 val posterImageURL: Observable<String>,
-                 val loading: Observable<Boolean>,
-                 val backDropImageURL: Observable<String>,
-                 val year: Observable<String>,
-                 val rating: Observable<String>)
+    class Output(val loading: Observable<Boolean>,
+                 val detailsViewData: Observable<DetailsViewData>,
+                 val castNames: Observable<String>,
+                 val crewNames: Observable<String>)
 }

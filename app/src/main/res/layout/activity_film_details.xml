@@ -92,7 +92,7 @@
                         android:textColor="@android:color/white" />
 
                     <TextView
-                        android:id="@+id/actorsTextView"
+                        android:id="@+id/castTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="8dp"
@@ -108,10 +108,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
-                        android:text="@string/creator"
+                        android:text="@string/crew"
                         android:textColor="@android:color/white" />
 
                     <TextView
+                        android:id="@+id/crewTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"

@@ -40,30 +40,27 @@ class FilmDetailsActivity : RxAppCompatActivity() {
         val input = FilmDetailsViewModel.Input(swipeRefresh.rx_refresh())
         val output = viewModel.transform(input)
 
-        output.title
+        output.detailsViewData
                 .takeUntilDestroyOf(this)
-                .subscribe(titleTextView::setText)
+                .subscribe(this::setFilmDetailsViewData)
 
-        output.overview
+        output.castNames
                 .takeUntilDestroyOf(this)
-                .subscribe(overviewTextView::setText)
+                .subscribe(castTextView::setText)
 
-        output.backDropImageURL
+        output.crewNames
                 .takeUntilDestroyOf(this)
-                .subscribe(backDropImageView::setImageFromUrl)
-
-        output.posterImageURL
-                .takeUntilDestroyOf(this)
-                .subscribe(posterImageView::setImageFromUrl)
-
-        output.year
-                .takeUntilDestroyOf(this)
-                .subscribe(yearTextView::setText)
-
-        output.rating
-                .takeUntilDestroyOf(this)
-                .subscribe(ratingTextView::setText)
+                .subscribe(crewTextView::setText)
 
         output.loading.subscribe(swipeRefresh::setRefreshing)
+    }
+
+    fun setFilmDetailsViewData(detailsViewData: FilmDetailsViewModel.DetailsViewData) {
+        titleTextView.text = detailsViewData.title
+        overviewTextView.text = detailsViewData.overview
+        backDropImageView.setImageFromUrl(detailsViewData.backDropImageURL)
+        posterImageView.setImageFromUrl(detailsViewData.posterImageURL)
+        yearTextView.text = detailsViewData.year
+        ratingTextView.text = detailsViewData.rating
     }
 }
