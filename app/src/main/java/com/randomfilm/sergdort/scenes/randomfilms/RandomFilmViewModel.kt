@@ -1,18 +1,26 @@
 package com.randomfilm.sergdort.scenes.randomfilms
 
 import com.randofilm.sergdort.domain.Film.*
-import com.randomfilm.sergdort.common.viewmodel.ViewModel
+import com.randomfilm.sergdort.common.relay.*
 import com.randomfilm.sergdort.extensions.*
+import com.trello.rxlifecycle2.LifecycleProvider
+import com.trello.rxlifecycle2.android.ActivityEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 
-class RandomFilmViewModel(private val filmsUseCase: FilmUseCase, private val navigator: IRandomFilmNavigator) : ViewModel<RandomFilmViewModel.Input, RandomFilmViewModel.Output> {
+class RandomFilmViewModel {
 
-    override fun transform(input: Input): Output {
+    val input = Input()
+    val output: Output
+
+    constructor(filmsUseCase: FilmUseCase,
+                navigator: IRandomFilmNavigator,
+                lifecycle: LifecycleProvider<ActivityEvent>) {
         val loadingIndicator = LoadingIndicator()
-        val films = input.refreshTrigger
+
+        val films = input.refreshTrigger.asObservable()
                 .startWith(Unit)
                 .switchMap {
                     filmsUseCase.randomFilms()
@@ -22,16 +30,23 @@ class RandomFilmViewModel(private val filmsUseCase: FilmUseCase, private val nav
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .map { it.results }
+                .takeUntilDestroyOf(lifecycle)
                 .shareReplayLatestWhileConnected()
 
-        val filmDetailsNavigation = input.selection
+        input.selection.asObservable()
                 .doOnNext(navigator::toFilmDetails)
                 .mapTo(Unit)
-                .share()
+                .takeUntilDestroyOf(lifecycle)
+                .subscribe()
 
-        return Output(films, loadingIndicator.asObservable(), filmDetailsNavigation)
+        output = Output(films, loadingIndicator.asObservable())
     }
 
-    class Input(val refreshTrigger: Observable<Unit>, val selection: Observable<Film>) {}
-    class Output(val films: Observable<List<Film>>, val loading: Observable<Boolean>, val filmDetailsNavigation: Observable<Unit>) {}
+    class Input {
+        val refreshTrigger: Relay<Unit> = PublishRelay()
+        val selection: Relay<Film> = PublishRelay()
+    }
+
+    class Output(val films: Observable<List<Film>>,
+                 val loading: Observable<Boolean>)
 }

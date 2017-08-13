@@ -6,6 +6,7 @@ import com.randofilm.sergdort.domain.Film.Film
 import com.randofilm.sergdort.randomfilm.R
 import com.randomfilm.sergdort.Dependencies
 import com.randomfilm.sergdort.common.adapters.ListRecycleViewAdapter
+import com.randomfilm.sergdort.common.relay.bindTo
 import com.randomfilm.sergdort.extensions.*
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_random_film.*
@@ -16,7 +17,7 @@ class RandomFilmActivity : RxAppCompatActivity() {
     private val viewModel: RandomFilmViewModel
         get() = Dependencies.instance
                 .makeRandomFilmAssembly()
-                .makeViewModelFor(this)
+                .makeViewModelWith(this, this)
 
     private val listViewAdapter = ListRecycleViewAdapter<Film>({
         ListRecycleViewAdapter.ViewHolder<Film>(it.inflate(R.layout.film_cell_item), { view, film ->
@@ -41,17 +42,22 @@ class RandomFilmActivity : RxAppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        val input = RandomFilmViewModel.Input(swipeRefresh.rx_refresh(), listViewAdapter.selection)
-        val output = viewModel.transform(input)
+        val viewModel = this.viewModel
+        val input = viewModel.input
+        val output = viewModel.output
+
+        swipeRefresh.rx_refresh()
+                .takeUntilDestroyOf(this)
+                .bindTo(input.refreshTrigger)
+
+        listViewAdapter.selection
+                .takeUntilDestroyOf(this)
+                .bindTo(input.selection)
 
         output.loading
-                .takeUntilDestroyOf(this)
                 .subscribe(swipeRefresh::setRefreshing)
-        output.films.takeUntilDestroyOf(this)
+        output.films
                 .bindTo(listViewAdapter)
-        output.filmDetailsNavigation
-                .takeUntilDestroyOf(this)
-                .subscribe()
     }
 }
 
