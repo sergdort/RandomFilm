@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.randofilm.sergdort.domain.Film.Film
 import com.randofilm.sergdort.randomfilm.R
 import com.randomfilm.sergdort.Dependencies
+import com.randomfilm.sergdort.common.relay.bindTo
 import com.randomfilm.sergdort.extensions.*
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_film_details.*
@@ -14,7 +15,7 @@ class FilmDetailsActivity : RxAppCompatActivity() {
     private val viewModel: FilmDetailsViewModel
         get() = Dependencies.instance
                 .makeFilmDetailsAssembly()
-                .makeViewModelWith(FilmDetailsActivity.filmIdFrom(intent))
+                .makeViewModelWith(FilmDetailsActivity.filmIdFrom(intent), this)
 
     companion object {
         private val extraFilmID = "EXTRA_FILM_ID"
@@ -37,8 +38,17 @@ class FilmDetailsActivity : RxAppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        val input = FilmDetailsViewModel.Input(swipeRefresh.rx_refresh())
-        val output = viewModel.transform(input)
+        val viewModel = this.viewModel
+
+        val output = viewModel.output
+        val input = viewModel.input
+
+//        Bind input
+        swipeRefresh.rx_refresh()
+                .takeUntilDestroyOf(this)
+                .bindTo(input.reload)
+
+//        Bind output
 
         output.detailsViewData
                 .takeUntilDestroyOf(this)

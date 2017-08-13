@@ -1,20 +1,25 @@
 package com.randomfilm.sergdort.scenes.filmdetails
 
 import com.randofilm.sergdort.domain.FilmDetails.*
-import com.randomfilm.sergdort.common.viewmodel.ViewModel
+import com.randomfilm.sergdort.common.relay.*
 import com.randomfilm.sergdort.extensions.*
+import com.trello.rxlifecycle2.LifecycleProvider
+import com.trello.rxlifecycle2.android.ActivityEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class FilmDetailsViewModel(private val filmID: Int,
-                           private val filmDetailsUseCase: FilmDetailsUseCase) : ViewModel<FilmDetailsViewModel.Input, FilmDetailsViewModel.Output> {
+class FilmDetailsViewModel {
+    val input = Input()
+    val output: Output
 
-    override fun transform(input: Input): Output {
+    constructor(filmID: Int,
+                filmDetailsUseCase: FilmDetailsUseCase,
+                lifecycleProvider: LifecycleProvider<ActivityEvent>) {
+
         val loadingIndicator = LoadingIndicator()
-
-        val pair = input.reloadTrigger
+        val pair = input.reload.asObservable()
                 .startWith(Unit)
                 .switchMap {
                     filmDetailsUseCase.detailsFor(filmID)
@@ -23,12 +28,12 @@ class FilmDetailsViewModel(private val filmID: Int,
                             .trackLoading(loadingIndicator)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+                .takeUntilDestroyOf(lifecycleProvider)
                 .shareReplayLatestWhileConnected()
 
         val detailsViewData = pair
                 .map { mapToViewData(it.first) }
                 .shareReplayLatestWhileConnected()
-
 
         val castNames = pair
                 .map {
@@ -38,7 +43,7 @@ class FilmDetailsViewModel(private val filmID: Int,
         val crewNames = pair.map { it.second.crew.take(10).map { it.name }.joinToString(", ") }
                 .shareReplayLatestWhileConnected()
 
-        return Output(loadingIndicator.asObservable(), detailsViewData, castNames, crewNames)
+        this.output = Output(loadingIndicator.asObservable(), detailsViewData, castNames, crewNames)
     }
 
     private fun mapToViewData(details: FilmDetails): DetailsViewData {
@@ -63,7 +68,10 @@ class FilmDetailsViewModel(private val filmID: Int,
             val year: String,
             val rating: String)
 
-    class Input(val reloadTrigger: Observable<Unit>)
+    class Input {
+        val reload: Relay<Unit> = PublishRelay<Unit>()
+    }
+
     class Output(val loading: Observable<Boolean>,
                  val detailsViewData: Observable<DetailsViewData>,
                  val castNames: Observable<String>,
