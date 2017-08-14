@@ -37,10 +37,17 @@ class FilmDetailsViewModel {
 
         val castNames = pair
                 .map {
-                    it.second.cast.filter { it.profilePath != null }
+                    it.second.cast
+                            .filter { it.profilePath != null }
+                            .distinctBy { it.id }
                 }
                 .shareReplayLatestWhileConnected()
-        val crewNames = pair.map { it.second.crew.filter { it.profilePicturePath != null } }
+        val crewNames = pair
+                .map {
+                    it.second.crew
+                            .filter { it.profilePicturePath != null }
+                            .distinctBy { it.id }
+                }
                 .shareReplayLatestWhileConnected()
 
         this.output = Output(loadingIndicator.asObservable(), detailsViewData, castNames, crewNames)
