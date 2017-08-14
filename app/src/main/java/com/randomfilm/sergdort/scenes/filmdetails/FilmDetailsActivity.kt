@@ -25,7 +25,7 @@ class FilmDetailsActivity : RxAppCompatActivity() {
     private val castViewAdapter = ListRecycleViewAdapter<Cast>({
         ViewHolder<Cast>(it.inflate(R.layout.cast_crew_cell_item), { view, cast ->
             Unit
-            val url = "https://image.tmdb.org/t/p/w500/${cast.profilePath}"
+            val url = "https://image.tmdb.org/t/p/w185/${cast.profilePath}"
             view.castImageView.setImageFromUrl(url)
             view.titleTextView.text = cast.name
         })
@@ -34,7 +34,7 @@ class FilmDetailsActivity : RxAppCompatActivity() {
     private val crewViewAdapter = ListRecycleViewAdapter<Crew>({
         ViewHolder<Crew>(it.inflate(R.layout.cast_crew_cell_item), { view, crew ->
             Unit
-            val url = "https://image.tmdb.org/t/p/w500/${crew.profilePicturePath}"
+            val url = "https://image.tmdb.org/t/p/w185/${crew.profilePicturePath}"
             view.castImageView.setImageFromUrl(url)
             view.titleTextView.text = crew.name
         })
