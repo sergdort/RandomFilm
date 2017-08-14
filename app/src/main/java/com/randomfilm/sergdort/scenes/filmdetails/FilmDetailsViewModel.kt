@@ -37,10 +37,10 @@ class FilmDetailsViewModel {
 
         val castNames = pair
                 .map {
-                    it.second.cast.take(10).map { it.name }.joinToString(", ")
+                    it.second.cast.filter { it.profilePath != null }
                 }
                 .shareReplayLatestWhileConnected()
-        val crewNames = pair.map { it.second.crew.take(10).map { it.name }.joinToString(", ") }
+        val crewNames = pair.map { it.second.crew.filter { it.profilePicturePath != null } }
                 .shareReplayLatestWhileConnected()
 
         this.output = Output(loadingIndicator.asObservable(), detailsViewData, castNames, crewNames)
@@ -74,6 +74,6 @@ class FilmDetailsViewModel {
 
     class Output(val loading: Observable<Boolean>,
                  val detailsViewData: Observable<DetailsViewData>,
-                 val castNames: Observable<String>,
-                 val crewNames: Observable<String>)
+                 val cast: Observable<List<Cast>>,
+                 val crew: Observable<List<Crew>>)
 }

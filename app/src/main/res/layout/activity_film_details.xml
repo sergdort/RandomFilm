@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,122 +14,141 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="150dp">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="2">
-
-                <ImageView
-                    android:id="@+id/backDropImageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
-
-                <ImageView
-                    android:id="@+id/posterImageView"
-                    android:layout_width="100dp"
-                    android:layout_height="140dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp" />
-            </RelativeLayout>
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/titleTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp">
+
+                    <ImageView
+                        android:id="@+id/backDropImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                    <ImageView
+                        android:id="@+id/posterImageView"
+                        android:layout_width="100dp"
+                        android:layout_height="140dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginLeft="8dp" />
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="2"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/yearTextView"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/titleTextView"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/yearTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/ratingTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:text="@string/staring"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/castRecycleView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:orientation="horizontal"
+                            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:text="@string/crew"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/crewRecycleView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:orientation="horizontal"
+                            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:text="@string/overview"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/ratingTextView"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/overviewTextView"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
                         android:textColor="@android:color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:text="@string/staring"
-                        android:textColor="@android:color/white" />
-
-                    <TextView
-                        android:id="@+id/castTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:textColor="@android:color/white" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:text="@string/crew"
-                        android:textColor="@android:color/white" />
-
-                    <TextView
-                        android:id="@+id/crewTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:textColor="@android:color/white" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/overviewTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp" />
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>

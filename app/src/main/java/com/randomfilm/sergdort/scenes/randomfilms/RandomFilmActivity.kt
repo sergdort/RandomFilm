@@ -23,7 +23,7 @@ class RandomFilmActivity : RxAppCompatActivity() {
         ListRecycleViewAdapter.ViewHolder<Film>(it.inflate(R.layout.film_cell_item), { view, film ->
             Unit
             val url = "https://image.tmdb.org/t/p/w500/${film.posterPath}"
-            view.imageView.setImageFromUrl(url)
+            view.castImageView.setImageFromUrl(url)
         })
     })
 
