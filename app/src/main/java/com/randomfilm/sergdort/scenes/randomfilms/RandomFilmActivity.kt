@@ -22,7 +22,7 @@ class RandomFilmActivity : RxAppCompatActivity() {
     private val listViewAdapter = ListRecycleViewAdapter<Film>({
         ListRecycleViewAdapter.ViewHolder<Film>(it.inflate(R.layout.film_cell_item), { view, film ->
             Unit
-            val url = "https://image.tmdb.org/t/p/w500/${film.posterPath}"
+            val url = "https://image.tmdb.org/t/p/w342/${film.posterPath}"
             view.castImageView.setImageFromUrl(url)
         })
     })
@@ -50,6 +50,10 @@ class RandomFilmActivity : RxAppCompatActivity() {
                 .takeUntilDestroyOf(this)
                 .bindTo(input.refreshTrigger)
 
+        recycleView.rx_nearBottomEdge()
+                .takeUntilDestroyOf(this)
+                .bindTo(input.nextPageTrigger)
+
         listViewAdapter.selection
                 .takeUntilDestroyOf(this)
                 .bindTo(input.selection)
@@ -58,6 +62,11 @@ class RandomFilmActivity : RxAppCompatActivity() {
                 .subscribe(swipeRefresh::setRefreshing)
         output.films
                 .bindTo(listViewAdapter)
+
+        recycleView.rx_nearBottomEdge().takeUntilDestroyOf(this)
+                .subscribe({
+                    println("!!!!!!!!!!LOAAADDDD!!!!!!!!")
+                })
     }
 }
 

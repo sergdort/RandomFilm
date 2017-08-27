@@ -20,17 +20,27 @@ class RandomFilmViewModel {
                 lifecycle: LifecycleProvider<ActivityEvent>) {
         val loadingIndicator = LoadingIndicator()
 
-        val films = input.refreshTrigger.asObservable()
+        val films = filmsUseCase.randomFilms()
+                .subscribeOn(Schedulers.io())
+                .shareReplayLatestWhileConnected()
+
+        val refreshed: Observable<FilmCommand> = input.refreshTrigger.asObservable()
                 .startWith(Unit)
+                .switchMap { _ -> films }
+                .map { Refreshed(it.resultsWithPosters()) }
+
+        val loaded: Observable<FilmCommand> = input.nextPageTrigger.asObservable()
+                .take(1)
+                .withLatestFrom(films)
                 .switchMap {
-                    filmsUseCase.randomFilms()
-                            .trackLoading(loadingIndicator)
+                    FilmsPagination.paginate(filmsUseCase, it, input.nextPageTrigger.asObservable())
                             .subscribeOn(Schedulers.io())
-                            .catchErrorJustComplete()
                 }
+                .map { Loaded(it.resultsWithPosters()) }
+
+        val filmResult = Observable.merge(refreshed, loaded)
+                .scan(listOf<Film>(), FilmsPagination()::reduce)
                 .observeOn(AndroidSchedulers.mainThread())
-                .map { it.results }
-                .takeUntilDestroyOf(lifecycle)
                 .shareReplayLatestWhileConnected()
 
         input.selection.asObservable()
@@ -39,14 +49,41 @@ class RandomFilmViewModel {
                 .takeUntilDestroyOf(lifecycle)
                 .subscribe()
 
-        output = Output(films, loadingIndicator.asObservable())
+        output = Output(filmResult, loadingIndicator.asObservable())
     }
+
 
     class Input {
         val refreshTrigger: Relay<Unit> = PublishRelay()
+        val nextPageTrigger: Relay<Unit> = PublishRelay()
         val selection: Relay<Film> = PublishRelay()
     }
 
     class Output(val films: Observable<List<Film>>,
                  val loading: Observable<Boolean>)
+
+}
+
+sealed class FilmCommand
+data class Refreshed(val films: List<Film>) : FilmCommand()
+data class Loaded(val films: List<Film>) : FilmCommand()
+
+class FilmsPagination {
+    companion object {
+        fun paginate(useCase: FilmUseCase,
+                     batch: FilmResults = FilmResults.initial(),
+                     nextPageTrigger: Observable<Unit>): Observable<FilmResults> {
+            val hasNextPage: (FilmResults) -> Boolean = { it -> true }
+            return useCase.randomFilmsAfter(batch)
+                    .paginate(nextPageTrigger, hasNextPage, {
+                        FilmsPagination.paginate(useCase, it, nextPageTrigger)
+                                .subscribeOn(Schedulers.io())
+                    })
+        }
+    }
+
+    fun reduce(films: List<Film>, command: FilmCommand): List<Film> = when (command) {
+        is Refreshed -> command.films
+        is Loaded -> films + command.films
+    }
 }

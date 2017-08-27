@@ -6,6 +6,7 @@ import com.trello.rxlifecycle2.android.ActivityEvent
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
+import java.util.concurrent.atomic.*
 
 fun <T> Observable<T>.takeUntilDestroyOf(lifecycleProvider: LifecycleProvider<ActivityEvent>): Observable<T> {
     return this.compose(lifecycleProvider.bindUntilEvent(ActivityEvent.DESTROY))
@@ -25,13 +26,43 @@ fun <T> Observable<Optional<T>>.skipNil(): Observable<T> {
     }
 }
 
+fun <T> Observable<T>.paginate(nextPageTrigger: Observable<Unit>,
+                               hasNextPage: (T) -> Boolean,
+                               nextPageFactory: (T) -> Observable<T>): Observable<T> {
+    return switchMap {
+        Pagination(it).paginate(nextPageTrigger, hasNextPage, nextPageFactory)
+    }
+}
+
+fun <T, U> Observable<T>.withLatestFrom(other: Observable<U>): Observable<U> {
+    return this.withLatestFrom(other, io.reactivex.functions.BiFunction<T, U, U> { first, second -> second })
+}
+
+fun <T, U> Observable<T>.rx_scan(initial: U, accumulator: (U, T) -> U): Observable<U> {
+    return this.scan(initial, io.reactivex.functions.BiFunction<U, T, U> { t1, t2 -> accumulator(t1, t2)})
+}
 
 fun <T, U> Observable<T>.combineLatestWith(other: Observable<U>): Observable<Pair<T, U>> {
-    return Observable.combineLatest(this, other, BiFunction<T, U, Pair<T, U>>{ first, second -> Pair(first, second) })
+    return Observable.combineLatest(this, other, BiFunction<T, U, Pair<T, U>> { first, second -> Pair(first, second) })
 }
 
 fun <E, T : List<E>> Observable<T>.bindTo(adapter: ListRecycleViewAdapter<E>): Disposable {
     return this.subscribe {
         adapter.updateItems(it)
+    }
+}
+
+class Pagination<T>(private val page: T) {
+    fun paginate(nextPageTrigger: Observable<Unit>,
+                 hasNextPage: (T) -> Boolean,
+                 nextPageFactory: (T) -> Observable<T>): Observable<T> {
+
+        if (!hasNextPage(page)) {
+            return Observable.just(page)
+        }
+        val arrayOfObservables = listOf(Observable.just(page),
+                Observable.never<T>().takeUntil(nextPageTrigger),
+                nextPageFactory(page))
+        return Observable.concat(arrayOfObservables)
     }
 }

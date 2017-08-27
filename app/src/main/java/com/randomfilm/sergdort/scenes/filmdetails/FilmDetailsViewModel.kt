@@ -61,7 +61,7 @@ class FilmDetailsViewModel {
         return DetailsViewData(
                 details.title,
                 details.overview.wrap().defaultTo(""),
-                "https://image.tmdb.org/t/p/w500/${details.posterPath}",
+                "https://image.tmdb.org/t/p/w342/${details.posterPath}",
                 "https://image.tmdb.org/t/p/w780/${details.backdropPath}",
                 year,
                 "${details.voteAverage}")

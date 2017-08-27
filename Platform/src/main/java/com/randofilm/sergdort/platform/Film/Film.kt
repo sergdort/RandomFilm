@@ -10,9 +10,9 @@ internal data class Film (
         @SerializedName("title")
         val title: String,
         @SerializedName("poster_path")
-        val posterPath: String,
+        val posterPath: String?,
         @SerializedName("backdrop_path")
-        val backdropPath: String,
+        val backdropPath: String?,
         @SerializedName("overview")
         val overview: String,
         @SerializedName("vote_average")
