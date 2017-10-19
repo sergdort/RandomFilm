@@ -1,5 +1,6 @@
 package com.randomfilm.sergdort.extensions
 
+import android.util.Log
 import com.randomfilm.sergdort.common.adapters.ListRecycleViewAdapter
 import com.trello.rxlifecycle2.LifecycleProvider
 import com.trello.rxlifecycle2.android.ActivityEvent
@@ -34,12 +35,21 @@ fun <T> Observable<T>.paginate(nextPageTrigger: Observable<Unit>,
     }
 }
 
+fun <T> Observable<T>.log(): Observable<T> {
+    val tag = "Observable"
+    return this
+            .doOnSubscribe { Log.d(tag, "Subscribed") }
+            .doOnNext { Log.d(tag, "Next: ${it}") }
+            .doOnError { Log.d(tag, "Error: ${it}") }
+            .doOnComplete { Log.d(tag, "Completed") }
+}
+
 fun <T, U> Observable<T>.withLatestFrom(other: Observable<U>): Observable<U> {
     return this.withLatestFrom(other, io.reactivex.functions.BiFunction<T, U, U> { first, second -> second })
 }
 
 fun <T, U> Observable<T>.rx_scan(initial: U, accumulator: (U, T) -> U): Observable<U> {
-    return this.scan(initial, io.reactivex.functions.BiFunction<U, T, U> { t1, t2 -> accumulator(t1, t2)})
+    return this.scan(initial, io.reactivex.functions.BiFunction<U, T, U> { t1, t2 -> accumulator(t1, t2) })
 }
 
 fun <T, U> Observable<T>.combineLatestWith(other: Observable<U>): Observable<Pair<T, U>> {

@@ -11,14 +11,17 @@ class Feedback<State, Event>(val closure: (Observable<State>) -> Observable<Even
 
 fun <State, Event> system(initialState: State,
                           reduce: (State, Event) -> State,
-                          scheduler: Scheduler, feedback: Iterable<Feedback<State, Event>>): Observable<State> {
+                          scheduler: Scheduler,
+                          feedback: Iterable<Feedback<State, Event>>): Observable<State> {
     return Observable.defer {
         val replaySubject = ReplaySubject.create<State>(1)
         val events = Observable.merge(feedback.map { it.closure(replaySubject) })
 
         events.scan(initialState, reduce)
                 .doOnNext(replaySubject::onNext)
-                .doOnSubscribe { replaySubject.onNext(initialState) }
+                .doOnSubscribe {
+                    replaySubject.onNext(initialState)
+                }
                 .observeOn(scheduler)
     }
 }
